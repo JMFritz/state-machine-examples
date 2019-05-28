@@ -1,0 +1,2 @@
+function-id: generatePaystubs
+template-path: ../../template.yaml
