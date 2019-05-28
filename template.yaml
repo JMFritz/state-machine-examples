@@ -1,3 +1,137 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Transform: 'AWS::Serverless-2016-10-31'
-Resources: {}
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  TriggerStateMachine:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-TriggerStateMachine
+      Description: !Sub
+        - Stack ${StackTagName} Environment ${EnvironmentTagName} Function ${ResourceName}
+        - ResourceName: TriggerStateMachine
+      CodeUri: src/TriggerStateMachine
+      Handler: index.handler
+      Runtime: nodejs8.10
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Policies:
+        - AWSXrayWriteOnlyAccess
+        - Statement:
+            - Effect: Allow
+              Action:
+                - states:StartExecution
+              Resource: !Ref MyStateMachine
+      Environment:
+        Variables:
+          STATE_MACHINE_ARN: !Ref MyStateMachine
+  Task2:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-Task2
+      Description: !Sub
+        - Stack ${StackTagName} Environment ${EnvironmentTagName} Function ${ResourceName}
+        - ResourceName: Task2
+      CodeUri: src/Task2
+      Handler: index.handler
+      Runtime: nodejs8.10
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Policies:
+        - AWSXrayWriteOnlyAccess
+  Task3:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-Task3
+      Description: !Sub
+        - Stack ${StackTagName} Environment ${EnvironmentTagName} Function ${ResourceName}
+        - ResourceName: Task3
+      CodeUri: src/Task3
+      Handler: index.handler
+      Runtime: nodejs8.10
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Policies:
+        - AWSXrayWriteOnlyAccess
+  Task1:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-Task1
+      Description: !Sub
+        - Stack ${StackTagName} Environment ${EnvironmentTagName} Function ${ResourceName}
+        - ResourceName: Task1
+      CodeUri: src/Task1
+      Handler: index.handler
+      Runtime: nodejs8.10
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Policies:
+        - AWSXrayWriteOnlyAccess
+  StatesExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - !Sub states.${AWS::Region}.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: StatesExecutionPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: '*'
+  MyStateMachine:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      DefinitionString: !Sub
+        - |-
+          {
+            "Comment": "A Hello World AWL example using an AWS Lambda function",
+            "StartAt": "Task1",
+            "States": {
+              "Task1": {
+                "Type": "Task",
+                "Resource": "${Lambda1}",
+                "Next": "Task2",
+                "Comment": "First task. Accept input at the beginning of the execution."
+              },
+              "Task2": {
+                "Type": "Task",
+                "Resource": "${Lambda2}",
+                "Next": "Task3",
+                "Comment": "Second task"
+              },
+              "Task3": {
+                "Type": "Task",
+                "Resource": "${Lambda3}",
+                "Next": "End",
+                "Comment": "Third/final task"
+              },
+              "DefaultState": {
+                "Type": "Fail",
+                "Cause": "No Matches!",
+                "Comment": "Default state."
+              }
+            }
+          }
+        - Lambda1: !GetAtt Task1.Arn
+          Lambda2: !GetAtt Task2.Arn
+          Lambda3: !GetAtt Task3.Arn
+      RoleArn: !GetAtt StatesExecutionRole.Arn
+Parameters:
+  StackTagName:
+    Type: String
+    Description: Stack Name (injected by Stackery at deployment time)
+  EnvironmentTagName:
+    Type: String
+    Description: Environment Name (injected by Stackery at deployment time)
