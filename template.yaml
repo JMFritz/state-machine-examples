@@ -116,11 +116,6 @@ Resources:
                 "Resource": "${Lambda3}",
                 "Next": "End",
                 "Comment": "Third/final task"
-              },
-              "DefaultState": {
-                "Type": "Fail",
-                "Cause": "No Matches!",
-                "Comment": "Default state."
               }
             }
           }
