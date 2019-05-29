@@ -114,7 +114,7 @@ Resources:
               "Task3": {
                 "Type": "Task",
                 "Resource": "${Lambda3}",
-                "Next": "End",
+                "End": true,
                 "Comment": "Third/final task"
               }
             }
