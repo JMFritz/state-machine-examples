@@ -176,12 +176,18 @@ Resources:
         - Lambda1: !GetAtt processData.Arn
           Lambda2: !GetAtt generatePaystubs.Arn
           Lambda3: !GetAtt generateReport.Arn
-          Topic: !GetAtt SuccessNotifications.Arn
+          Topic: !Ref SuccessNotifications
       RoleArn: !GetAtt StatesExecutionRole.Arn
   SuccessNotifications:
     Type: AWS::SNS::Topic
     Properties:
       TopicName: !Sub ${AWS::StackName}-SuccessNotifications
+  SuccessSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Ref SuccessNotifications
+      Endpoint: jun@stackery.io
+      Protocol: email
 Parameters:
   StackTagName:
     Type: String
