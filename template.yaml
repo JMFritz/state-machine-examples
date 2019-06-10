@@ -133,6 +133,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - lambda:InvokeFunction
+                  - sns:Publish
                 Resource: '*'
   MyStateMachine:
     Type: AWS::StepFunctions::StateMachine
@@ -158,15 +159,29 @@ Resources:
               "generateReport": {
                 "Type": "Task",
                 "Resource": "${Lambda3}",
-                "End": true,
+                "Next": "successNotification",
                 "Comment": "Third/final task."
+              },
+              "successNotification": {
+                "Type": "Task",
+                "Resource": "arn:aws:states:::sns:publish",
+                "Parameters": {
+                  "TopicArn": "${Topic}",
+                  "Message": "Payroll process complete."
+                },
+                "End": true
               }
             }
           }
         - Lambda1: !GetAtt processData.Arn
           Lambda2: !GetAtt generatePaystubs.Arn
           Lambda3: !GetAtt generateReport.Arn
+          Topic: !GetAtt SuccessNotifications.Arn
       RoleArn: !GetAtt StatesExecutionRole.Arn
+  SuccessNotifications:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub ${AWS::StackName}-SuccessNotifications
 Parameters:
   StackTagName:
     Type: String
