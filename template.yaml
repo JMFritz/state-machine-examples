@@ -148,26 +148,87 @@ Resources:
                 "Type": "Task",
                 "Resource": "${Lambda1}",
                 "Next": "generatePaystubs",
-                "Comment": "First task. Accept input at the beginning of the execution."
+                "Comment": "First task. Accept input at the beginning of the execution.",
+                "Catch": [
+                  {
+                    "ErrorEquals": [
+                      "CustomError"
+                    ],
+                    "Next": "errorNotification"
+                  },
+                  {
+                    "ErrorEquals": [
+                      "States.ALL"
+                    ],
+                    "Next": "errorNotification"
+                  }
+                ]
               },
               "generatePaystubs": {
                 "Type": "Task",
                 "Resource": "${Lambda2}",
                 "Next": "generateReport",
-                "Comment": "Second task."
+                "Comment": "Second task.",
+                "Catch": [
+                  {
+                    "ErrorEquals": [
+                      "CustomError"
+                    ],
+                    "Next": "errorNotification"
+                  },
+                  {
+                    "ErrorEquals": [
+                      "States.ALL"
+                    ],
+                    "Next": "errorNotification"
+                  }
+                ]
               },
               "generateReport": {
                 "Type": "Task",
                 "Resource": "${Lambda3}",
                 "Next": "successNotification",
-                "Comment": "Third/final task."
+                "Comment": "Third/final task.",
+                "Retry": [
+                  {
+                    "ErrorEquals": [
+                      "States.Timeout"
+                    ],
+                    "IntervalSeconds": 2,
+                    "MaxAttempts": 2
+                  }
+                ],
+                "Catch": [
+                  {
+                    "ErrorEquals": [
+                      "CustomError"
+                    ],
+                    "Next": "errorNotification"
+                  },
+                  {
+                    "ErrorEquals": [
+                      "States.ALL"
+                    ],
+                    "Next": "errorNotification"
+                  }
+                ]
               },
               "successNotification": {
                 "Type": "Task",
                 "Resource": "arn:aws:states:::sns:publish",
                 "Parameters": {
-                  "TopicArn": "${Topic}",
+                  "TopicArn": "${Topic1}",
                   "Message": "Payroll process complete."
+                },
+                "End": true
+              },
+              "errorNotification": {
+                "Type": "Task",
+                "Resource": "arn:aws:states:::sns:publish",
+                "Parameters": {
+                  "TopicArn": "${Topic2}",
+                  "Subject": "[ERROR]: Task failed",
+                  "Message.$": "$.Cause"
                 },
                 "End": true
               }
@@ -176,7 +237,8 @@ Resources:
         - Lambda1: !GetAtt processData.Arn
           Lambda2: !GetAtt generatePaystubs.Arn
           Lambda3: !GetAtt generateReport.Arn
-          Topic: !Ref SuccessNotifications
+          Topic1: !Ref SuccessNotifications
+          Topic2: !Ref ErrorNotifications
       RoleArn: !GetAtt StatesExecutionRole.Arn
   SuccessNotifications:
     Type: AWS::SNS::Topic
@@ -186,6 +248,16 @@ Resources:
     Type: AWS::SNS::Subscription
     Properties:
       TopicArn: !Ref SuccessNotifications
+      Endpoint: jun@stackery.io
+      Protocol: email
+  ErrorNotifications:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub ${AWS::StackName}-ErrorNotifications
+  ErrorSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Ref ErrorNotifications
       Endpoint: jun@stackery.io
       Protocol: email
 Parameters:
