@@ -53,12 +53,5 @@ exports.handler = async (event) => {
   console.log(JSON.stringify(event));
 
   return event;
-  // function CustomError(task) {
-  //   this.name = 'CustomError';
-  //   this.message = 'Process failed on task: ' + task;
-  // }
-  // CustomError.prototype = new Error();
-
-  // const error = new CustomError(event.completedTask);
-  // throw error;
+  // throw new Error(`${event.completedTask} task failed...`);
 };

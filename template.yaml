@@ -152,12 +152,6 @@ Resources:
                 "Catch": [
                   {
                     "ErrorEquals": [
-                      "CustomError"
-                    ],
-                    "Next": "errorNotification"
-                  },
-                  {
-                    "ErrorEquals": [
                       "States.ALL"
                     ],
                     "Next": "errorNotification"
@@ -170,12 +164,6 @@ Resources:
                 "Next": "generateReport",
                 "Comment": "Second task.",
                 "Catch": [
-                  {
-                    "ErrorEquals": [
-                      "CustomError"
-                    ],
-                    "Next": "errorNotification"
-                  },
                   {
                     "ErrorEquals": [
                       "States.ALL"
@@ -199,12 +187,6 @@ Resources:
                   }
                 ],
                 "Catch": [
-                  {
-                    "ErrorEquals": [
-                      "CustomError"
-                    ],
-                    "Next": "errorNotification"
-                  },
                   {
                     "ErrorEquals": [
                       "States.ALL"
