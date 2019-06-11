@@ -1,7 +1,7 @@
 // Load AWS SDK and create a new S3 object
 const AWS = require("aws-sdk");
 const s3 = new AWS.S3();
-const paystubs = process.env.paystubs_S3_BUCKET_NAME; 
+const paystubs = process.env.paystubs_S3_BUCKET_NAME;
 
 exports.handler = async (event, context) => {
 
@@ -12,18 +12,18 @@ exports.handler = async (event, context) => {
   };
   const s3listResponse = await s3.listObjects(params).promise();
 
-  /* 
+  /*
   Generate Individual Paystubs and Rollup File
 
-  Retrieve csv files and execute scripts that calculate earnings 
-  and then write formatted paystub output to a pdf file for each 
-  employee as well as a single csv file that contains all data 
+  Retrieve csv files and execute scripts that calculate earnings
+  and then write formatted paystub output to a pdf file for each
+  employee as well as a single csv file that contains all data
   within each paystub.
 
   Put individual files into the paystubs S3 bucket under a specific prefix.
   */
-  
-  const files = ["rollup.csv","employee_1.pdf","employee_2.pdf","employee_3.pdf","employee_4.pdf","employee_5.pdf"] 
+
+  const files = ["rollup.csv","employee_1.pdf","employee_2.pdf","employee_3.pdf","employee_4.pdf","employee_5.pdf"]
 
   let s3Promises = [];
 
@@ -43,5 +43,13 @@ exports.handler = async (event, context) => {
   event.completedTask = "generatePaystubs";
   console.log(JSON.stringify(event))
 
-  return event
+  return event;
+  // function CustomError(task) {
+  //   this.name = 'CustomError';
+  //   this.message = 'Process failed on task: ' + task;
+  // }
+  // CustomError.prototype = new Error();
+
+  // const error = new CustomError(event.currentTask);
+  // throw error;
 };

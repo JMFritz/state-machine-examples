@@ -10,7 +10,7 @@ exports.handler = async (event, context) => {
   };
   const s3getResponse = await s3.getObject(params).promise();
 
-  /* 
+  /*
   Generate report for the business owner and their CPA who produces
   the payments and submits the direct deposits for each employee.
 
@@ -18,8 +18,8 @@ exports.handler = async (event, context) => {
 
   Put each report in the S3 bucket under a specific prefix.
   */
-  
-  const files = ["report.pdf", "report.csv"] 
+
+  const files = ["report.pdf", "report.csv"]
   let s3Promises = [];
 
   files.forEach((file) => {
@@ -37,5 +37,13 @@ exports.handler = async (event, context) => {
   event.completedTask = "generateReport";
   console.log(JSON.stringify(event))
 
-  return event
+  // return event;
+  function CustomError(task) {
+    this.name = 'CustomError';
+    this.message = 'Process failed on task: ' + task;
+  }
+  CustomError.prototype = new Error();
+
+  const error = new CustomError(event.currentTask);
+  throw error;
 };
