@@ -44,6 +44,6 @@ exports.handler = async (event, context) => {
   }
   CustomError.prototype = new Error();
 
-  const error = new CustomError(event.currentTask);
+  const error = new CustomError(event.completedTask);
   throw error;
 };
