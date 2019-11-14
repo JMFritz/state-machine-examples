@@ -160,6 +160,11 @@ Resources:
                   "Message": "Pipeline execution successful."
                 },
                 "End": true
+              },
+              "DefaultState": {
+                "Type": "Fail",
+                "Cause": "The value does not match available choice metrics.",
+                "Comment": "Default state."
               }
             }
           }
