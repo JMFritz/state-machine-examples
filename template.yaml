@@ -33,7 +33,7 @@ Resources:
         - ResourceName: Task2
       CodeUri: src/Task2
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       MemorySize: 3008
       Timeout: 30
       Tracing: Active
@@ -48,7 +48,7 @@ Resources:
         - ResourceName: Task3
       CodeUri: src/Task3
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       MemorySize: 3008
       Timeout: 30
       Tracing: Active
@@ -63,7 +63,7 @@ Resources:
         - ResourceName: Task1
       CodeUri: src/Task1
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       MemorySize: 3008
       Timeout: 30
       Tracing: Active
