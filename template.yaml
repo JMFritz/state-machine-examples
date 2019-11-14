@@ -10,7 +10,7 @@ Resources:
         - ResourceName: TriggerStateMachine
       CodeUri: src/TriggerStateMachine
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       MemorySize: 3008
       Timeout: 30
       Tracing: Active
@@ -97,7 +97,7 @@ Resources:
         - |-
           {
             "Comment": "A Hello World AWL example using an AWS Lambda function",
-            "StartAt": "Task1",
+            "StartAt": "ParallelTasks",
             "States": {
               "ParallelTasks": {
                 "Type": "Parallel",
@@ -151,7 +151,7 @@ Resources:
                 ],
                 "Default": "DefaultState",
                 "Comment": "Determines whether to loop through parallel tasks again or publish success notification to SNS."
-              }
+              },
               "SuccessNotification": {
                 "Type": "Task",
                 "Resource": "arn:aws:states:::sns:publish",
