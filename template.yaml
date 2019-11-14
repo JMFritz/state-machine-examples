@@ -99,29 +99,74 @@ Resources:
             "Comment": "A Hello World AWL example using an AWS Lambda function",
             "StartAt": "Task1",
             "States": {
-              "Task1": {
-                "Type": "Task",
-                "Resource": "${Lambda1}",
-                "Next": "Task2",
-                "Comment": "First task. Accept input at the beginning of the execution."
+              "ParallelTasks": {
+                "Type": "Parallel",
+                "Next": "ChoiceState"
+                "Branches": [
+                  {
+                    "StartAt": "Task1",
+                    "States": {
+                      "Task1": {
+                        "Type": "Task",
+                        "Resource": "${Lambda1}",
+                        "End": true,
+                        "Comment": "Single Task"
+                      }
+                    }
+                  },
+                  {
+                    "StartAt": "Task2",
+                    "States": {
+                      "Task2": {
+                        "Type": "Task",
+                        "Resource": "${Lambda2}",
+                        "Next": "Task3",
+                        "Comment": "Sequential Task 1 of 2"
+                      },
+                      "Task3": {
+                        "Type": "Task",
+                        "Resource": "${Lambda3}",
+                        "End": true,
+                        "Comment": "Sequential Task 2 of 2"
+                      }
+                    }
+                  }
+                ]
               },
-              "Task2": {
+              "ChoiceState": {
+                "Type": "Choice",
+                "Choices": [
+                  {
+                    "Variable": "$.isComplete",
+                    "BooleanEquals": true,
+                    "Next": "SuccessNotification"
+                  },
+                  {
+                    "Not": {
+                      "Variable": "$.isComplete",
+                      "BooleanEquals": false
+                    },
+                    "Next": "ParallelTasks"
+                  }
+                ],
+                "Default": "DefaultState",
+                "Comment": "Determines whether to loop through parallel tasks again or publish success notification to SNS."
+              }
+              "SuccessNotification": {
                 "Type": "Task",
-                "Resource": "${Lambda2}",
-                "Next": "Task3",
-                "Comment": "Second task"
-              },
-              "Task3": {
-                "Type": "Task",
-                "Resource": "${Lambda3}",
-                "End": true,
-                "Comment": "Third/final task"
+                "Resource": "arn:aws:states:::sns:publish",
+                "Parameters": {
+                  "TopicArn": "${Topic1}",
+                  "Message": "Pipeline execution successful."
+                },
+                "End": true
               }
             }
           }
         - Lambda1: !GetAtt Task1.Arn
           Lambda2: !GetAtt Task2.Arn
           Lambda3: !GetAtt Task3.Arn
+          Topic1: !Ref SuccessNotification
       RoleArn: !GetAtt StatesExecutionRole.Arn
 Parameters:
   StackTagName:
