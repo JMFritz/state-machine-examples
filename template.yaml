@@ -101,7 +101,7 @@ Resources:
             "States": {
               "ParallelTasks": {
                 "Type": "Parallel",
-                "Next": "ChoiceState"
+                "Next": "ChoiceState",
                 "Branches": [
                   {
                     "StartAt": "Task1",
