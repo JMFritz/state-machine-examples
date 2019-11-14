@@ -166,7 +166,7 @@ Resources:
         - Lambda1: !GetAtt Task1.Arn
           Lambda2: !GetAtt Task2.Arn
           Lambda3: !GetAtt Task3.Arn
-          Topic1: !Ref SuccessNotification
+          Topic1: !Ref SuccessNotifications
       RoleArn: !GetAtt StatesExecutionRole.Arn
   SuccessNotifications:
     Type: AWS::SNS::Topic
