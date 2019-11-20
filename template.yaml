@@ -64,8 +64,7 @@ Resources:
     Type: AWS::StepFunctions::StateMachine
     Properties:
       DefinitionString: !Sub
-        - |-
-          Comment: A Hello World AWL example using an AWS Lambda function
+        - Comment: A Hello World AWL example using an AWS Lambda function
           StartAt: Task1
           States:
             Task1:
