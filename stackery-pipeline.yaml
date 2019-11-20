@@ -1,0 +1,19 @@
+stages:
+  Test: # stage name
+    - Unit Tests: # step/check name
+        uses: lambda # lambda || fargate
+        run: echo "Running unit tests." # shell command
+        order: 1 # matching order # run in parallel, omit for seq.
+    - Scan IAM:
+        uses: lambda
+        run: | # `|` indicates sequential in-line commands to follow
+          echo "Scanning source for IAM credentials."
+          echo "Scanning for permissive IAM rules."
+        order: 1
+  Staging:
+    - Deploy to staging:
+        uses: fargate
+        run: stackery deploy -n foo -e staging -r ${ref}
+    - Integration Tests:
+        uses: fargate
+        run: ./integration-tests.sh # execute local script
