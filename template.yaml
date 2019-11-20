@@ -68,11 +68,12 @@ Resources:
           Comment: A Hello World AWL example using an AWS Lambda function
           StartAt: Task1
           States:
-          Task1:
-            Type: Task
-            Resource: !GetAtt Task1.Arn
-            End: true
-            Comment: First task. Accept input at the beginning of the execution.
+            Task1:
+              Type: Task
+              Resource: ${Task1}
+              End: true
+              Comment: First task. Accept input at the beginning of the execution.
+        - Task1: !GetAtt Task1.Arn
       RoleArn: !GetAtt StatesExecutionRole.Arn
 Parameters:
   StackTagName:
