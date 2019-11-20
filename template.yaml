@@ -63,7 +63,7 @@ Resources:
   MyStateMachine:
     Type: AWS::StepFunctions::StateMachine
     Properties:
-      DefinitionString:
+      DefinitionString: |-
         Comment: A Hello World AWL example using an AWS Lambda function
         StartAt: Task1
         States:
